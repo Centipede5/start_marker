@@ -31,7 +31,7 @@
             <h4 class="my-0 font-weight-normal">Mark</h4>
           </div>
           <div class="card-body">
-            <h1 class="card-title pricing-card-title"><b id="numstarts">0</b> <small class="text-muted"> starts</small></h1>
+            <h1 class="card-title pricing-card-title"> <small class="text-muted"> start </small><b id="numstarts">0 </b>  <small class="text-muted"> heat </small><b id="heatnum">1</b> </h1>
             <div class="row container form-group mt-3">
                 <div class="col">Distance</div>
                 <div class="col">Stroke</div>
@@ -41,9 +41,6 @@
                     <option>50</option>
                     <option>100</option>
                     <option>200</option>
-                    <option>500</option>
-                    <option>1000</option>
-                    <option>1650</option>
                 </select>
                 <select id="stroke" class="col form-control">
                     <option>Fly</option>
@@ -51,7 +48,7 @@
                     <option>Breast</option>
                     <option>Free</option>
                     <option>IM</option>
-                    <option>Other</option>
+                    <option>Mixed</option>
                 </select>
             </div>
             
@@ -82,21 +79,36 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
     <script>
       var starts = Lockr.get('starts')||[]; 
+      var heat = 1;
       var numstarts = starts.length;
+      
       document.getElementById("numstarts").innerHTML = numstarts;
+      document.getElementById("stroke").onchange = function(){
+          heat =1;
+          document.getElementById("heatnum").innerHTML = heat;
+      }
+      document.getElementById("dist").onchange = function(){
+          heat =1;
+          document.getElementById("heatnum").innerHTML = heat;
+      }
       
       document.getElementById("starter").onclick = function(){
           numstarts++;
+          
           document.getElementById("numstarts").innerHTML = numstarts;
           starts.push({
               time:new Date()-0,
+              heat:heat,
+              course:"scm",
               stroke:document.getElementById("stroke").value,
               dist:document.getElementById("dist").value,
-          })
+          });
+          heat++;
+          document.getElementById("heatnum").innerHTML = heat;
           Lockr.set('starts', starts); 
       }
       document.getElementById("download").onclick = function(){
-          download(JSON.stringify(Lockr.get('starts')),"data.json");
+          download(btoa(JSON.stringify(Lockr.get('starts'))),"data.txt");
       }
       document.getElementById("clear").onclick = function(){
           if(confirm("are you sure you want to delete all the data")){
