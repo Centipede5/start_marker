@@ -15,26 +15,46 @@
 
   <body>
 
-    <div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom box-shadow">
-      <h5 class="my-0 mr-md-auto font-weight-normal">Time Trials </h5>
-    </div>
+    <!--<div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom box-shadow">-->
+    <!--  <h5 class="my-0 mr-md-auto font-weight-normal">Time Trials </h5>-->
+    <!--</div>-->
 
-    <div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
-      <h1 class="display-4">Start Timer Marker</h1>
-      <p class="lead">Select the event then press the button to mark a start</p>
+    <!--<div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">-->
+    <!--  <h1 class="display-4">Start Timer Marker</h1>-->
+    <!--  <p class="lead">Select the event then press the button to mark a start</p>-->
+    <!--</div>-->
+    <div class="modal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Modal title</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p>Modal body text goes here.</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary">Save changes</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
     </div>
-
     <div class="container">
       <div class="card-deck mb-3 text-center">
         <div class="card mb-4 box-shadow">
           <div class="card-header">
-            <h4 class="my-0 font-weight-normal">Mark</h4>
+            <h4 class="my-0 font-weight-normal">Start Marker</h4>
           </div>
           <div class="card-body">
             <h1 class="card-title pricing-card-title"> <small class="text-muted" style="display:none;"> start </small><b style="display:none;" id="numstarts">0 </b>  <small class="text-muted"> heat </small><b id="heatnum">1</b> </h1>
             <div class="row container form-group mt-3">
                 <div class="col">Distance</div>
                 <div class="col">Stroke</div>
+                <div class="col">Round</div>
+                <div class="col">Course</div>
             </div>
             <div class="row container form-group mb-4">
                 <select id="dist" class="col form-control">
@@ -50,6 +70,16 @@
                     <option>IM</option>
                     <option>Mixed</option>
                 </select>
+                <select id="round" class="col form-control">
+                    <option>T</option>
+                    <option>P</option>
+                    <option>F</option>
+                </select>
+                <select id="course" disabled class="col form-control">
+                    <option>SCY</option>
+                    <option>SCM</option>
+                    <option>LCM</option>
+                </select>
             </div>
             
             <!--<ul class="list-unstyled mt-3 mb-4">-->
@@ -58,8 +88,9 @@
             <!--  <li>Email support</li>-->
             <!--  <li>Help center access</li>-->
             <!--</ul>-->
-            <button id="starter" type="button" class="btn btn-lg btn-block btn-primary">Start</button>
+            <button id="starter" style = "height: 200px;font-size: 40px;"type="button" class="btn btn-lg btn-block btn-primary">Start</button>
             <button id="download" type="button" class="btn btn-lg btn-block btn-secondary">Download Results</button>
+            <!--<button type="button"  class="switch btn btn-lg btn-block btn-secondary">On / Off</button>-->
             
           </div>
         </div>
@@ -72,6 +103,7 @@
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
     <script type="text/javascript" src="download.js"></script>
+    <script src="flash.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lockr@0.8.4/lockr.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
@@ -81,7 +113,7 @@
       var starts = Lockr.get('starts')||[]; 
       var heat = 1;
       var numstarts = starts.length;
-      
+      var start = new Audio("start.mp3");
       document.getElementById("numstarts").innerHTML = numstarts;
       document.getElementById("stroke").onchange = function(){
           heat =1;
@@ -91,24 +123,44 @@
           heat =1;
           document.getElementById("heatnum").innerHTML = heat;
       }
+      //Test browser support
+      
       
       document.getElementById("starter").onclick = function(){
           numstarts++;
-          
-          document.getElementById("numstarts").innerHTML = numstarts;
-          starts.push({
-              time:new Date()-0,
-              heat:heat,
-              course:"scm",
-              stroke:document.getElementById("stroke").value,
-              dist:document.getElementById("dist").value,
-          });
-          heat++;
-          document.getElementById("heatnum").innerHTML = heat;
-          Lockr.set('starts', starts); 
+          start.currentTime=0.1;
+          //start.play();
+          if(o)
+            o.stop();
+          var context = new AudioContext()
+          var o = context.createOscillator()
+          o.type = "sine"
+          o.frequency.setValueAtTime(1000, context.currentTime)
+          o.connect(context.destination)
+          window.flashCamera();
+          o.start()
+          setTimeout(function(){
+            o.stop();  
+          },500)
+          var c = confirm("Are you sure this start is valid?");
+          if(c){
+            document.getElementById("numstarts").innerHTML = numstarts;
+            starts.push({
+                time:new Date()-0,
+                heat:heat,
+                course:"scm",
+                stroke:document.getElementById("stroke").value,
+                course:document.getElementById("course").value,
+                round:document.getElementById("round").value,
+                dist:document.getElementById("dist").value,
+            });
+            heat++;
+            document.getElementById("heatnum").innerHTML = heat;
+            Lockr.set('starts', starts); 
+          }
       }
       document.getElementById("download").onclick = function(){
-          download(btoa(JSON.stringify(Lockr.get('starts'))),"data.txt");
+          download(JSON.stringify(Lockr.get('starts')),"data.json");
       }
       document.getElementById("clear").onclick = function(){
           if(confirm("are you sure you want to delete all the data")){
