@@ -40,7 +40,7 @@ window.flashCamera = function(){
                     track.applyConstraints({
                       advanced: [{torch: false}]
                     });
-                },1000);
+                },900);
               }
             });
           });
